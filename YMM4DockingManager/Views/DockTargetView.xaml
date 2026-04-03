@@ -1,0 +1,55 @@
+<!--
+  1 ドックスロットのレイアウト。Row1 は WinFormsHost の上にだけ見える案内（エアスペース対策）。
+  実際の外部ウィンドウ埋め込みは code-behind の WinForms Panel。詳細は DockTargetView.xaml.cs。
+-->
+<UserControl x:Class="YMM4DockingManager.Views.DockTargetView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- WinFormsHost はエアスペースで上に描画されるため、案内はホストと重ねず専用行に置く -->
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Padding="6">
+            <DockPanel LastChildFill="False">
+                <StackPanel Orientation="Vertical" DockPanel.Dock="Left">
+                    <TextBlock Text="{Binding PanelTitle}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding AttachedName}" Opacity="0.8"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <Button Content="解除" Command="{Binding DetachCommand}" Padding="8,2"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Border x:Name="EmptyHintBanner"
+                Grid.Row="1"
+                Background="#F5F5F5"
+                BorderBrush="#33000000"
+                BorderThickness="0,0,0,1"
+                Padding="16,12"
+                Visibility="Visible">
+            <TextBlock HorizontalAlignment="Center"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       LineHeight="28">
+                <Run Text="Ctrl キーを押しながら"/><LineBreak/>
+                <Run Text="ウィンドウをドラッグ&amp;ドロップ"/>
+            </TextBlock>
+        </Border>
+
+        <WindowsFormsHost x:Name="WfHost" Grid.Row="2" />
+    </Grid>
+</UserControl>
+
