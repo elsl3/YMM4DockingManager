@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="YukkuriMovieMaker.Controls">
+      <HintPath>C:\YMM4\YMM4 Lite\YukkuriMovieMaker.Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="YukkuriMovieMaker.Plugin">
+      <HintPath>C:\YMM4\YMM4 Lite\YukkuriMovieMaker.Plugin.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputCopyDir>$(ProjectDir)Output\$(Configuration)\</OutputCopyDir>
+  </PropertyGroup>
+
+  <Target Name="CopyArtifactsToOutputFolder" AfterTargets="Build">
+    <MakeDir Directories="$(OutputCopyDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(OutputCopyDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(OutputCopyDir)" SkipUnchangedFiles="true" Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+  </Target>
+
+  <!-- .ymme = DLL を zip 化し拡張子を .ymme に変更（YMM4 公式の配布形式に合わせる）。DLL 確定後に実行する -->
+  <Target Name="PackageYmme" AfterTargets="CopyArtifactsToOutputFolder" Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup>
+      <_YmmeDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\publish'))</_YmmeDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(_YmmeDir)" />
+    <Exec Command="powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command &quot;$ErrorActionPreference='Stop'; $d='$(TargetPath)'; $z='$(_YmmeDir)\YMM4DockingManager.zip'; $y='$(_YmmeDir)\YMM4DockingManager.ymme'; if (Test-Path -LiteralPath $z) { Remove-Item -LiteralPath $z -Force }; if (Test-Path -LiteralPath $y) { Remove-Item -LiteralPath $y -Force }; Compress-Archive -LiteralPath $d -DestinationPath $z -Force; Move-Item -LiteralPath $z -Destination $y -Force&quot;" />
+  </Target>
+
+</Project>
